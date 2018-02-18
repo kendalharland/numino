@@ -2,89 +2,91 @@ package numino
 
 import "math/rand"
 
-// Cell represents a space on the game grid.
-type Cell struct {
+// Block represents an object that occupies a space on the game grid.
+type Block struct {
 	Col   int
 	Row   int
 	Value int
 }
 
-// ActiveCells manages the cells that currently under player-control.
-type ActiveCells struct {
-	// FramesPerStep is the number of frames that pass between cell-movements.
+// FallingBlocks manages the cells that currently under player-control.
+type FallingBlocks struct {
+	// FramesPerStep is the number of frames that pass between block-movements.
 	FramesPerStep int
 	// The cells under player control.
-	cells []Cell
+	blocks []Block
 }
 
-// Cells returns a copy of the cells in these ActiveCells.
-func (ac ActiveCells) Cells() []Cell {
-	cellsCopy := make([]Cell, len(ac.cells))
-	copy(cellsCopy, ac.cells)
-	return cellsCopy
+// Blocks returns a copy of the cells in these FallingBlocks.
+func (blocks FallingBlocks) Blocks() []Block {
+	blocksCopy := make([]Block, len(blocks.blocks))
+	copy(blocksCopy, blocks.blocks)
+	return blocksCopy
 }
 
-// Update updates this ActiveCells given the elapsed frameCount and gameState.
-func (ac *ActiveCells) Update(frameCount int, game *GameState) {
+// Update updates this FallingBlocks given the elapsed frameCount and gameState.
+func (blocks *FallingBlocks) Update(frameCount int, game *GameState) {
 	// TODO: Check if frameCount > fpStep
-	for i := range ac.cells {
-		ac.cells[i].Row++
+	for i := range blocks.blocks {
+		blocks.blocks[i].Row++
 	}
 }
 
-func (ac ActiveCells) Length() int {
-	return len(ac.cells)
+// Length ...
+func (blocks FallingBlocks) Length() int {
+	return len(blocks.blocks)
 }
 
-// GetLandedCells returns the list of active cells that are landed.
+// LandedBlocks returns the list of active cells that are landed.
 //
-// An active cell is landed iff:
-// 1. It overlaps an inactive cell.
-// 2. It overlaps a dead cell.
+// An active block is landed iff:
+// 1. It overlaps an inactive block.
+// 2. It overlaps a dead block.
 // 3. It is in the final row of the grid.
 //
 // cellState is a two-dimensional grid of CellState for looking up inactive
 // cells.
-func (ac ActiveCells) GetLandedCells(game *GameState) []Cell {
-	var landed []Cell
-	for i, cell := range ac.cells {
-		if cell.Row >= game.RowCount() ||
-			!game.IsEmpty(cell.Row, cell.Col) ||
-			game.IsDead(cell.Row, cell.Col) {
-			landed = append(landed, ac.cells[i])
+func (blocks FallingBlocks) LandedBlocks(game *GameState) []Block {
+	var landed []Block
+	for i, block := range blocks.blocks {
+		if block.Row >= game.RowCount() ||
+			!game.IsEmpty(block.Row, block.Col) ||
+			game.IsDead(block.Row, block.Col) {
+			landed = append(landed, blocks.blocks[i])
 		}
 	}
 	return landed
 }
 
 // Clear clears all cells from this collection.
-func (ac *ActiveCells) Clear() {
-	ac.cells = []Cell{}
+func (blocks *FallingBlocks) Clear() {
+	blocks.blocks = []Block{}
 }
 
 // Add adds an ActiveCell to this collection.
-func (ac *ActiveCells) Add(row int, col int, value int) {
-	ac.cells = append(ac.cells, Cell{
+func (blocks *FallingBlocks) Add(row int, col int, value int) {
+	blocks.blocks = append(blocks.blocks, Block{
 		Row:   row,
 		Col:   col,
 		Value: value,
 	})
 }
 
-func (ac *ActiveCells) Remove(row int, col int) {
-	for i, cell := range ac.cells {
-		if cell.Row == row && cell.Col == col {
-			ac.cells = append(ac.cells[:i], ac.cells[i+1:]...)
+// Remove ...
+func (blocks *FallingBlocks) Remove(row int, col int) {
+	for i, block := range blocks.blocks {
+		if block.Row == row && block.Col == col {
+			blocks.blocks = append(blocks.blocks[:i], blocks.blocks[i+1:]...)
 			return
 		}
 	}
 }
 
 // Random generates a new set of cells in the first row.
-func (ac *ActiveCells) Random(r *rand.Rand, count int) {
+func (blocks *FallingBlocks) Random(r *rand.Rand, count int) {
 	for i := 0; i < count; i++ {
 		if (r.Int() % 5) > 3 {
-			ac.Add(0, i, 5)
+			blocks.Add(0, i, 5)
 		}
 	}
 }

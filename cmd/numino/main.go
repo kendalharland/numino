@@ -27,7 +27,7 @@ func run() {
 		Rows:       numRows,
 		SquareSize: 50,
 	}
-	activeCells := numino.ActiveCells{FramesPerStep: 60}
+	fallingBlocks := numino.FallingBlocks{FramesPerStep: 60}
 
 	cfg := pixelgl.WindowConfig{
 		Title:  "Numino",
@@ -41,23 +41,23 @@ func run() {
 	var imgs []*imdraw.IMDraw
 	for !win.Closed() {
 		// Update sub systems.
-		activeCells.Update(10, game)
+		fallingBlocks.Update(10, game)
 
-		// Add landed cells to the grid.
-		landedCells := activeCells.GetLandedCells(game)
-		for _, cell := range landedCells {
-			game.AddCell(cell)
-			activeCells.Remove(cell.Row, cell.Col)
+		// Add landed blocks to the grid.
+		landedBlocks := fallingBlocks.LandedBlocks(game)
+		for _, block := range landedBlocks {
+			game.AddBlock(block)
+			fallingBlocks.Remove(block.Row, block.Col)
 		}
 		if game.IsOver() {
 			println("GAME OVER!")
 			return
 		}
 
-		// Clear the active cells and generate new ones if all have landed.
-		if len(landedCells) == activeCells.Length() {
-			activeCells.Clear()
-			activeCells.Random(random, game.ColCount())
+		// Clear the active blocks and generate new ones if all have landed.
+		if len(landedBlocks) == fallingBlocks.Length() {
+			fallingBlocks.Clear()
+			fallingBlocks.Random(random, game.ColCount())
 		}
 
 		win.Clear(colornames.Aliceblue)
@@ -67,8 +67,8 @@ func run() {
 			img.Draw(win)
 		}
 
-		// Render active cells
-		imgs = renderBlocks(activeCells.Cells(), grid)
+		// Render active blocks
+		imgs = renderBlocks(fallingBlocks.Blocks(), grid)
 		for _, img := range imgs {
 			img.Draw(win)
 		}
@@ -82,7 +82,7 @@ func main() {
 	pixelgl.Run(run)
 }
 
-func renderBlocks(blocks []numino.Cell, grid *numino.Grid) []*imdraw.IMDraw {
+func renderBlocks(blocks []numino.Block, grid *numino.Grid) []*imdraw.IMDraw {
 	var imgs []*imdraw.IMDraw
 	for _, block := range blocks {
 		col := grid.ColumnToPixel(block.Col)
