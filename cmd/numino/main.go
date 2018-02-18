@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
+	"strconv"
+	"time"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
@@ -66,6 +69,7 @@ func run() {
 		renderGameState(game, grid).Render(win)
 		renderBlocks(fallingBlocks.Blocks(), grid).Render(win)
 		win.Update()
+		time.Sleep(time.Second / 2)
 	}
 }
 
@@ -78,9 +82,12 @@ func renderBlocks(blocks []numino.Block, grid *numino.Grid) numino.Renderer {
 	for _, block := range blocks {
 		col := grid.ColumnToPixel(block.Col)
 		row := grid.RowToPixel(block.Row)
-
 		img := numino.CreateSquare(col, row, grid.SquareSize, numino.Red)
-		txt := text.New(pixel.V(row, col), atlas)
+
+		col = grid.ColumnToCell(block.Col)
+		row = grid.RowToCell(block.Row)
+		txt := text.New(pixel.V(col, row), atlas)
+		fmt.Fprintf(txt, strconv.Itoa(block.Value))
 
 		renderers = append(renderers, numino.NewImageRenderer(img))
 		renderers = append(renderers, numino.NewTextRenderer(txt))

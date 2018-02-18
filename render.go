@@ -1,6 +1,8 @@
 package numino
 
 import (
+	"golang.org/x/image/colornames"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -47,5 +49,7 @@ func NewTextRenderer(text *text.Text) *TextRenderer {
 
 // Render implements the Renderer interface
 func (r TextRenderer) Render(win *pixelgl.Window) {
+	win.SetColorMask(colornames.Black)
 	r.text.Draw(win, pixel.IM)
+	win.SetColorMask(colornames.Aliceblue)
 }
