@@ -80,7 +80,7 @@ func run() {
 		renderGameState(game, grid).Render(win)
 		renderBlocks(fallingBlocks.Blocks(), grid).Render(win)
 		win.Update()
-		time.Sleep(time.Second / 5)
+		time.Sleep(time.Second / 6)
 	}
 }
 

@@ -112,7 +112,7 @@ const (
 // 2. There is no other falling block to its left.
 // 3. It is not in the leftmost column.
 func (blocks *FallingBlocks) ShiftLeft(game *GameState) {
-	shifted := make(map[Block]bool)
+	shifted := make(map[*Block]bool)
 	for i := range blocks.blocks {
 		blocks.shift(left, game, shifted, &blocks.blocks[i])
 	}
@@ -125,17 +125,17 @@ func (blocks *FallingBlocks) ShiftLeft(game *GameState) {
 // 2. There is no other falling block to its right.
 // 3. It is not in the rightmost column.
 func (blocks *FallingBlocks) ShiftRight(game *GameState) {
-	shifted := make(map[Block]bool)
+	shifted := make(map[*Block]bool)
 	for i := range blocks.blocks {
-		blocks.shift(right, game, shifted, &blocks.blocks[len(blocks.blocks)-1-i])
+		blocks.shift(right, game, shifted, &blocks.blocks[i])
 	}
 }
 
-func (blocks *FallingBlocks) shift(dir direction, game *GameState, shifted map[Block]bool, block *Block) {
-	if val, ok := shifted[*block]; ok && val {
+func (blocks *FallingBlocks) shift(dir direction, game *GameState, shifted map[*Block]bool, block *Block) {
+	if val, ok := shifted[block]; ok || val {
 		return
 	}
-	shifted[*block] = true
+	shifted[block] = true
 
 	// If there's a neighbor blocking the current block's movement, shift that
 	// nieghbor first to see if a space is created for this block to shift into.
