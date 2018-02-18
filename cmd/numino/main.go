@@ -5,7 +5,6 @@ import (
 	"image/color"
 	"math/rand"
 	"strconv"
-	"time"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
@@ -34,7 +33,7 @@ func run() {
 		Rows:       numRows,
 		SquareSize: 50,
 	}
-	fallingBlocks := numino.FallingBlocks{FramesPerStep: 120000}
+	fallingBlocks := numino.NewFallingBlocks(60)
 
 	cfg := pixelgl.WindowConfig{
 		Title:  "Numino",
@@ -45,19 +44,21 @@ func run() {
 		panic(err)
 	}
 
+	ticks := 0
 	for !win.Closed() {
+		ticks++
 		if win.JustPressed(pixelgl.KeyS) {
 			fallingBlocks.Slam()
 		}
-		if win.Pressed(pixelgl.KeyA) {
+		if win.JustPressed(pixelgl.KeyA) {
 			fallingBlocks.ShiftLeft(game)
 		}
-		if win.Pressed(pixelgl.KeyD) {
+		if win.JustPressed(pixelgl.KeyD) {
 			fallingBlocks.ShiftRight(game)
 		}
 
 		// Update sub systems.
-		fallingBlocks.Update(1, game)
+		fallingBlocks.Update(ticks, game)
 
 		// Add landed blocks to the grid.
 		landedBlocks := fallingBlocks.LandedBlocks(game)
@@ -80,7 +81,6 @@ func run() {
 		renderGameState(game, grid).Render(win)
 		renderBlocks(fallingBlocks.Blocks(), grid).Render(win)
 		win.Update()
-		time.Sleep(time.Second / 6)
 	}
 }
 

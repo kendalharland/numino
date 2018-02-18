@@ -14,10 +14,16 @@ type Block struct {
 
 // FallingBlocks manages the cells that currently under player-control.
 type FallingBlocks struct {
-	// FramesPerStep is the number of frames that pass between block-movements.
-	FramesPerStep int
 	// The cells under player control.
-	blocks []Block
+	blocks  []Block
+	counter counter
+}
+
+// NewFallingBlocks returns a pointer to a new FallingBlocks.
+func NewFallingBlocks(ticksPerStep int) *FallingBlocks {
+	return &FallingBlocks{
+		counter: counter{Ticks: ticksPerStep},
+	}
 }
 
 // Blocks returns a copy of the cells in these FallingBlocks.
@@ -27,11 +33,12 @@ func (blocks FallingBlocks) Blocks() []Block {
 	return blocksCopy
 }
 
-// Update updates this FallingBlocks given the elapsed frameCount and gameState.
-func (blocks *FallingBlocks) Update(frameCount int, game *GameState) {
-	// TODO: Check if frameCount > fpStep
-	for i := range blocks.blocks {
-		blocks.blocks[i].Row++
+// Update updates this FallingBlocks given the current ticks and gameState.
+func (blocks *FallingBlocks) Update(ticks int, game *GameState) {
+	if blocks.counter.Update(ticks) {
+		for i := range blocks.blocks {
+			blocks.blocks[i].Row++
+		}
 	}
 }
 
