@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"math/rand"
 	"strconv"
 	"time"
@@ -80,20 +81,26 @@ func main() {
 func renderBlocks(blocks []numino.Block, grid *numino.Grid) numino.Renderer {
 	var renderers numino.MultiRenderer
 	for _, block := range blocks {
-		col := grid.ColumnToPixel(block.Col)
-		row := grid.RowToPixel(block.Row)
-		img := numino.CreateSquare(col, row, grid.SquareSize, numino.Red)
-
-		col = grid.ColumnToCell(block.Col)
-		row = grid.RowToCell(block.Row)
-		txt := text.New(pixel.V(col, row), atlas)
-		fmt.Fprintf(txt, strconv.Itoa(block.Value))
-
-		renderers = append(renderers, numino.NewImageRenderer(img))
-		renderers = append(renderers, numino.NewTextRenderer(txt))
+		renderers = append(renderers, renderBlock(block, grid, colornames.Red))
 	}
 
 	return renderers
+}
+
+func renderBlock(block numino.Block, grid *numino.Grid, color color.RGBA) numino.Renderer {
+	col := grid.ColumnToPixel(block.Col)
+	row := grid.RowToPixel(block.Row)
+	img := numino.CreateSquare(col, row, grid.SquareSize, numino.Red)
+
+	col = grid.ColumnToCell(block.Col)
+	row = grid.RowToCell(block.Row)
+	txt := text.New(pixel.V(col, row), atlas)
+	fmt.Fprintf(txt, strconv.Itoa(block.Value))
+
+	return numino.MultiRenderer([]numino.Renderer{
+		numino.NewImageRenderer(img),
+		numino.NewTextRenderer(txt),
+	})
 }
 
 func renderGameState(game *numino.GameState, grid *numino.Grid) numino.Renderer {
