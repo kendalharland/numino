@@ -2,8 +2,19 @@ package numino
 
 // GameState represents the state
 type GameState struct {
-	cells     [][]int
+	// activeCells are the cells currently under player-control.
+	ActiveCells []ActiveCell
+	// cells are cells that have been placed on the grid.
+	cells [][]int
+	// cellState tracks whether a cell is dead or live.
 	cellState [][]CellState
+}
+
+// ActiveCell is a cell under player-control.
+type ActiveCell struct {
+	Col   int
+	Row   int
+	Value int
 }
 
 // CellState determines whether a cell is dead or live.
@@ -30,6 +41,14 @@ func NewGameState(rows int, cols int) *GameState {
 	return g
 }
 
+func (gs GameState) RowCount() int {
+	return len(gs.cells)
+}
+
+func (gs GameState) ColCount() int {
+	return len(gs.cells[0])
+}
+
 // IsOver returns true iff this game is over.
 //
 // This game is over when the top-most row of any column contains a dead cell.
@@ -48,4 +67,33 @@ func (gs *GameState) SetCellValue(row int, col int, value int) {
 
 func (gs *GameState) SetCellState(row int, col int, state CellState) {
 	gs.cellState[row][col] = state
+}
+
+func (gs *GameState) ClearActiveCells() {
+	gs.ActiveCells = []ActiveCell{}
+}
+
+func (gs *GameState) AddActiveCell(row int, col int, value int) {
+	gs.ActiveCells = append(gs.ActiveCells, ActiveCell{
+		Row:   row,
+		Col:   col,
+		Value: value,
+	})
+}
+
+func (gs *GameState) ShiftActiveCellsDown() bool {
+	var cellsMoved bool
+	for i, cell := range gs.ActiveCells {
+		// Can't shift past the bottom of the grid.
+		if cell.Row >= gs.RowCount()-1 {
+			continue
+		}
+		// Can't shift past a dead cell.
+		if gs.cellState[cell.Row+1][cell.Col] == DeadCell {
+			continue
+		}
+		gs.ActiveCells[i].Row++
+		cellsMoved = true
+	}
+	return cellsMoved
 }
