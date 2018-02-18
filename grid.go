@@ -24,9 +24,9 @@ func (g Grid) RowToPixel(n int) float64 {
 }
 
 func (g Grid) ColumnToCell(n int) float64 {
-	return g.ColumnToPixel(n) + g.SquareSize/2
+	return g.ColumnToPixel(n) + g.SquareSize/2.2
 }
 
 func (g Grid) RowToCell(n int) float64 {
-	return g.RowToPixel(n) + g.SquareSize/2
+	return g.RowToPixel(n) + g.SquareSize/2.2
 }

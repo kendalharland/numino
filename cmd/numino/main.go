@@ -5,13 +5,15 @@ import (
 	"image/color"
 	"math/rand"
 	"strconv"
+	"time"
+
+	"golang.org/x/image/font/basicfont"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
 	"github.com/kharland/numino"
 	"golang.org/x/image/colornames"
-	"golang.org/x/image/font/basicfont"
 )
 
 const (
@@ -22,18 +24,16 @@ const (
 )
 
 var (
+	// Used for text rendering.
 	atlas = text.NewAtlas(basicfont.Face7x13, text.ASCII)
 )
 
 func run() {
+	random := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
+
 	game := numino.NewGameState(numRows, numCols)
-	random := rand.New(rand.NewSource(42))
-	grid := &numino.Grid{
-		Cols:       numCols,
-		Rows:       numRows,
-		SquareSize: 50,
-	}
-	fallingBlocks := numino.NewFallingBlocks(60)
+	grid := &numino.Grid{Cols: numCols, Rows: numRows, SquareSize: 50}
+	fallingBlocks := numino.NewFallingBlocks(30)
 
 	cfg := pixelgl.WindowConfig{
 		Title:  "Numino",

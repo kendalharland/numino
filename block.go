@@ -96,7 +96,11 @@ func (blocks *FallingBlocks) Remove(row int, col int) {
 func (blocks *FallingBlocks) Random(r *rand.Rand, count int) {
 	for i := 0; i < count; i++ {
 		if (r.Int() % 5) > 3 {
-			blocks.Add(0, i, 5)
+			value := r.Int() % 10
+			if value == 0 {
+				value += 5
+			}
+			blocks.Add(0, i, value)
 		}
 	}
 }
