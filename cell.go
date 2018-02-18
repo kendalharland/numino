@@ -71,6 +71,15 @@ func (ac *ActiveCells) Add(row int, col int, value int) {
 	})
 }
 
+func (ac *ActiveCells) Remove(row int, col int) {
+	for i, cell := range ac.cells {
+		if cell.Row == row && cell.Col == col {
+			ac.cells = append(ac.cells[:i], ac.cells[i+1:]...)
+			return
+		}
+	}
+}
+
 // Random generates a new set of cells in the first row.
 func (ac *ActiveCells) Random(r *rand.Rand, count int) {
 	for i := 0; i < count; i++ {

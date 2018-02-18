@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -41,18 +42,37 @@ func run() {
 	for !win.Closed() {
 		// Update sub systems.
 		activeCells.Update(10, game)
+
+		// Add landed cells to the grid.
 		landedCells := activeCells.GetLandedCells(game)
-		// Do something with landed cells...
+		for _, cell := range landedCells {
+			game.AddCell(cell)
+			activeCells.Remove(cell.Row, cell.Col)
+		}
+		if game.IsOver() {
+			println("GAME OVER!")
+			return
+		}
+
+		// Clear the active cells and generate new ones if all have landed.
 		if len(landedCells) == activeCells.Length() {
 			activeCells.Clear()
 			activeCells.Random(random, game.ColCount())
 		}
 
-		imgs = renderBlocks(activeCells.Cells(), grid)
 		win.Clear(colornames.Aliceblue)
+		// Render game state.
+		imgs = renderGameState(game, grid)
 		for _, img := range imgs {
 			img.Draw(win)
 		}
+
+		// Render active cells
+		imgs = renderBlocks(activeCells.Cells(), grid)
+		for _, img := range imgs {
+			img.Draw(win)
+		}
+
 		win.Update()
 		time.Sleep(time.Second)
 	}
@@ -65,10 +85,33 @@ func main() {
 func renderBlocks(blocks []numino.Cell, grid *numino.Grid) []*imdraw.IMDraw {
 	var imgs []*imdraw.IMDraw
 	for _, block := range blocks {
-		col, _ := grid.ColumnToPixel(block.Col)
-		row, _ := grid.RowToPixel(block.Row)
-		img := numino.CreateSquare(col, row, grid.SquareSize)
+		col := grid.ColumnToPixel(block.Col)
+		row := grid.RowToPixel(block.Row)
+		img := numino.CreateSquare(col, row, grid.SquareSize, numino.Red)
 		imgs = append(imgs, img)
+	}
+	return imgs
+}
+
+func renderGameState(game *numino.GameState, grid *numino.Grid) []*imdraw.IMDraw {
+	var imgs []*imdraw.IMDraw
+	for row := 0; row < game.RowCount(); row++ {
+		for col := 0; col < game.ColCount(); col++ {
+			if !game.IsEmpty(row, col) {
+				fmt.Println("Drawing: ", row, col)
+				var color pixel.RGBA
+				if game.IsDead(row, col) {
+					color = numino.Blue
+				} else {
+					color = numino.Green
+				}
+
+				imgs = append(imgs, numino.CreateSquare(
+					grid.ColumnToPixel(col),
+					grid.RowToPixel(row),
+					grid.SquareSize, color))
+			}
+		}
 	}
 	return imgs
 }
