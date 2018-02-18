@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"time"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -14,7 +13,7 @@ import (
 
 const (
 	// The number of rows to start the game with
-	numRows = 5
+	numRows = 15
 	// The number of cols to start the game with
 	numCols = 8
 )
@@ -27,7 +26,7 @@ func run() {
 		Rows:       numRows,
 		SquareSize: 50,
 	}
-	fallingBlocks := numino.FallingBlocks{FramesPerStep: 60}
+	fallingBlocks := numino.FallingBlocks{FramesPerStep: 10000}
 
 	cfg := pixelgl.WindowConfig{
 		Title:  "Numino",
@@ -41,7 +40,7 @@ func run() {
 	var imgs []*imdraw.IMDraw
 	for !win.Closed() {
 		// Update sub systems.
-		fallingBlocks.Update(10, game)
+		fallingBlocks.Update(1, game)
 
 		// Add landed blocks to the grid.
 		landedBlocks := fallingBlocks.LandedBlocks(game)
@@ -55,8 +54,7 @@ func run() {
 		}
 
 		// Clear the active blocks and generate new ones if all have landed.
-		if len(landedBlocks) == fallingBlocks.Length() {
-			fallingBlocks.Clear()
+		if fallingBlocks.Length() == 0 {
 			fallingBlocks.Random(random, game.ColCount())
 		}
 
@@ -74,7 +72,7 @@ func run() {
 		}
 
 		win.Update()
-		time.Sleep(time.Second)
+		// time.Sleep(time.Second)
 	}
 }
 
