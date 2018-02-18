@@ -5,7 +5,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 )
 
-// createSquare returns a square image at position x, y whose side length
+// CreateSquare returns a square image at position x, y whose side length
 // is size.
 func CreateSquare(x float64, y float64, size float64) *imdraw.IMDraw {
 	imd := imdraw.New(nil)
