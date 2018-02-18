@@ -19,14 +19,14 @@ const (
 )
 
 func run() {
+	game := numino.NewGameState(numRows, numCols)
 	random := rand.New(rand.NewSource(42))
 	grid := &numino.Grid{
 		Cols:       numCols,
 		Rows:       numRows,
 		SquareSize: 50,
 	}
-
-	game := numino.NewGameState(numRows, numCols)
+	activeCells := numino.ActiveCells{FramesPerStep: 60}
 
 	cfg := pixelgl.WindowConfig{
 		Title:  "Numino",
@@ -38,16 +38,17 @@ func run() {
 	}
 
 	var imgs []*imdraw.IMDraw
-	generate := true
 	for !win.Closed() {
-		if generate {
-			generate = false
-			randomActiveCells(random, grid, game)
-		} else {
-			generate = !game.ShiftActiveCellsDown()
+		// Update sub systems.
+		activeCells.Update(10, game)
+		landedCells := activeCells.GetLandedCells(game)
+		// Do something with landed cells...
+		if len(landedCells) == activeCells.Length() {
+			activeCells.Clear()
+			activeCells.Random(random, game.ColCount())
 		}
-		imgs = renderBlocks(game.ActiveCells, grid)
 
+		imgs = renderBlocks(activeCells.Cells(), grid)
 		win.Clear(colornames.Aliceblue)
 		for _, img := range imgs {
 			img.Draw(win)
@@ -61,23 +62,7 @@ func main() {
 	pixelgl.Run(run)
 }
 
-func randomActiveCells(r *rand.Rand, grid *numino.Grid, game *numino.GameState) {
-	for i, b := range randomBools(r, grid.Cols) {
-		if b {
-			game.AddActiveCell(0, i, 5)
-		}
-	}
-}
-
-func randomBools(r *rand.Rand, count int) []bool {
-	var states []bool
-	for i := 0; i < count; i++ {
-		states = append(states, (r.Int()%5) > 3)
-	}
-	return states
-}
-
-func renderBlocks(blocks []numino.ActiveCell, grid *numino.Grid) []*imdraw.IMDraw {
+func renderBlocks(blocks []numino.Cell, grid *numino.Grid) []*imdraw.IMDraw {
 	var imgs []*imdraw.IMDraw
 	for _, block := range blocks {
 		col, _ := grid.ColumnToPixel(block.Col)

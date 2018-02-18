@@ -2,6 +2,7 @@ package numino
 
 import "errors"
 
+// Grid is a model for computing the boundaries and locations of game entities.
 type Grid struct {
 	Cols       int
 	Rows       int
