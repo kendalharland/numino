@@ -63,6 +63,10 @@ func (gs *GameState) IsDead(row int, col int) bool {
 	return gs.blockState[row][col] == DeadBlock
 }
 
+func (gs *GameState) ValueAt(row int, col int) int {
+	return gs.blocks[row][col]
+}
+
 // AddBlock adds the given block to this GameState.
 //
 // If the block overlaps a dead block, it is added to the row above its current
@@ -87,8 +91,8 @@ func (gs *GameState) AddBlock(block Block) {
 	}
 
 	// Merge live block values.
-	gs.blocks[block.Row-1][block.Col] += block.Value
-	if gs.blocks[block.Row-1][block.Col] > maxLiveValue {
-		gs.blockState[block.Row-1][block.Col] = DeadBlock
+	gs.blocks[block.Row][block.Col] += block.Value
+	if gs.blocks[block.Row][block.Col] > maxLiveValue {
+		gs.blockState[block.Row][block.Col] = DeadBlock
 	}
 }

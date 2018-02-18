@@ -90,7 +90,7 @@ func renderBlocks(blocks []numino.Block, grid *numino.Grid) numino.Renderer {
 func renderBlock(block numino.Block, grid *numino.Grid, color color.RGBA) numino.Renderer {
 	col := grid.ColumnToPixel(block.Col)
 	row := grid.RowToPixel(block.Row)
-	img := numino.CreateSquare(col, row, grid.SquareSize, numino.Red)
+	img := numino.CreateSquare(col, row, grid.SquareSize, color)
 
 	col = grid.ColumnToCell(block.Col)
 	row = grid.RowToCell(block.Row)
@@ -108,18 +108,17 @@ func renderGameState(game *numino.GameState, grid *numino.Grid) numino.Renderer 
 	for row := 0; row < game.RowCount(); row++ {
 		for col := 0; col < game.ColCount(); col++ {
 			if !game.IsEmpty(row, col) {
-				var color pixel.RGBA
+
+				var color color.RGBA
 				if game.IsDead(row, col) {
-					color = numino.Blue
+					color = colornames.Blue
 				} else {
-					color = numino.Green
+					color = colornames.Green
 				}
 
-				img := numino.CreateSquare(
-					grid.ColumnToPixel(col),
-					grid.RowToPixel(row),
-					grid.SquareSize, color)
-				renderers = append(renderers, numino.NewImageRenderer(img))
+				block := numino.Block{Col: col, Row: row,
+					Value: game.ValueAt(row, col)}
+				renderers = append(renderers, renderBlock(block, grid, color))
 			}
 		}
 	}
