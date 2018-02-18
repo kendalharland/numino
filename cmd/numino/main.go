@@ -37,42 +37,31 @@ func run() {
 		panic(err)
 	}
 
-	var imgs []*imdraw.IMDraw
 	for !win.Closed() {
 		// Update sub systems.
 		fallingBlocks.Update(1, game)
 
-		// Add landed blocks to the grid.
+		// Add landed blocks to the grid.  If all blocks have landed, generate
+		// a new wave of blocks.
 		landedBlocks := fallingBlocks.LandedBlocks(game)
 		for _, block := range landedBlocks {
 			game.AddBlock(block)
 			fallingBlocks.Remove(block.Row, block.Col)
 		}
+		if fallingBlocks.Length() == 0 {
+			fallingBlocks.Random(random, game.ColCount())
+		}
+
 		if game.IsOver() {
 			println("GAME OVER!")
 			return
 		}
 
-		// Clear the active blocks and generate new ones if all have landed.
-		if fallingBlocks.Length() == 0 {
-			fallingBlocks.Random(random, game.ColCount())
-		}
-
+		// Render.
 		win.Clear(colornames.Aliceblue)
-		// Render game state.
-		imgs = renderGameState(game, grid)
-		for _, img := range imgs {
-			img.Draw(win)
-		}
-
-		// Render active blocks
-		imgs = renderBlocks(fallingBlocks.Blocks(), grid)
-		for _, img := range imgs {
-			img.Draw(win)
-		}
-
+		renderGameState(game, grid).Draw(win)
+		renderBlocks(fallingBlocks.Blocks(), grid).Draw(win)
 		win.Update()
-		// time.Sleep(time.Second)
 	}
 }
 
@@ -80,7 +69,7 @@ func main() {
 	pixelgl.Run(run)
 }
 
-func renderBlocks(blocks []numino.Block, grid *numino.Grid) []*imdraw.IMDraw {
+func renderBlocks(blocks []numino.Block, grid *numino.Grid) numino.Drawer {
 	var imgs []*imdraw.IMDraw
 	for _, block := range blocks {
 		col := grid.ColumnToPixel(block.Col)
@@ -88,10 +77,10 @@ func renderBlocks(blocks []numino.Block, grid *numino.Grid) []*imdraw.IMDraw {
 		img := numino.CreateSquare(col, row, grid.SquareSize, numino.Red)
 		imgs = append(imgs, img)
 	}
-	return imgs
+	return numino.ImagesDrawer(imgs)
 }
 
-func renderGameState(game *numino.GameState, grid *numino.Grid) []*imdraw.IMDraw {
+func renderGameState(game *numino.GameState, grid *numino.Grid) numino.Drawer {
 	var imgs []*imdraw.IMDraw
 	for row := 0; row < game.RowCount(); row++ {
 		for col := 0; col < game.ColCount(); col++ {
@@ -111,5 +100,5 @@ func renderGameState(game *numino.GameState, grid *numino.Grid) []*imdraw.IMDraw
 			}
 		}
 	}
-	return imgs
+	return numino.ImagesDrawer(imgs)
 }
