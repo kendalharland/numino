@@ -9,12 +9,21 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+const (
+	// The number of rows to start the game with
+	numRows = 15
+	// The number of cols to start the game with
+	numCols = 8
+)
+
 func run() {
 	grid := &numino.Grid{
-		Cols:       8,
-		Rows:       10,
+		Cols:       numCols,
+		Rows:       numRows,
 		SquareSize: 50,
 	}
+
+	game := numino.NewGameState(numRows, numCols)
 
 	cfg := pixelgl.WindowConfig{
 		Title:  "Numino",

@@ -5,8 +5,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 )
 
-// CreateSquare returns a square image at position x, y whose side length
-// is size.
+// CreateSquare returns a square at position x, y whose side length is size.
 func CreateSquare(x float64, y float64, size float64) *imdraw.IMDraw {
 	imd := imdraw.New(nil)
 	imd.Color = pixel.RGB(1, 0, 0)
