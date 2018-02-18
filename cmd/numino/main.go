@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/text"
 	"github.com/kharland/numino"
 	"golang.org/x/image/colornames"
+	"golang.org/x/image/font/basicfont"
 )
 
 const (
@@ -16,6 +16,10 @@ const (
 	numRows = 15
 	// The number of cols to start the game with
 	numCols = 8
+)
+
+var (
+	atlas = text.NewAtlas(basicfont.Face7x13, text.ASCII)
 )
 
 func run() {
@@ -26,7 +30,7 @@ func run() {
 		Rows:       numRows,
 		SquareSize: 50,
 	}
-	fallingBlocks := numino.FallingBlocks{FramesPerStep: 10000}
+	fallingBlocks := numino.FallingBlocks{FramesPerStep: 120000}
 
 	cfg := pixelgl.WindowConfig{
 		Title:  "Numino",
@@ -59,8 +63,8 @@ func run() {
 
 		// Render.
 		win.Clear(colornames.Aliceblue)
-		renderGameState(game, grid).Draw(win)
-		renderBlocks(fallingBlocks.Blocks(), grid).Draw(win)
+		renderGameState(game, grid).Render(win)
+		renderBlocks(fallingBlocks.Blocks(), grid).Render(win)
 		win.Update()
 	}
 }
@@ -69,23 +73,27 @@ func main() {
 	pixelgl.Run(run)
 }
 
-func renderBlocks(blocks []numino.Block, grid *numino.Grid) numino.Drawer {
-	var imgs []*imdraw.IMDraw
+func renderBlocks(blocks []numino.Block, grid *numino.Grid) numino.Renderer {
+	var renderers numino.MultiRenderer
 	for _, block := range blocks {
 		col := grid.ColumnToPixel(block.Col)
 		row := grid.RowToPixel(block.Row)
+
 		img := numino.CreateSquare(col, row, grid.SquareSize, numino.Red)
-		imgs = append(imgs, img)
+		txt := text.New(pixel.V(row, col), atlas)
+
+		renderers = append(renderers, numino.NewImageRenderer(img))
+		renderers = append(renderers, numino.NewTextRenderer(txt))
 	}
-	return numino.ImagesDrawer(imgs)
+
+	return renderers
 }
 
-func renderGameState(game *numino.GameState, grid *numino.Grid) numino.Drawer {
-	var imgs []*imdraw.IMDraw
+func renderGameState(game *numino.GameState, grid *numino.Grid) numino.Renderer {
+	var renderers numino.MultiRenderer
 	for row := 0; row < game.RowCount(); row++ {
 		for col := 0; col < game.ColCount(); col++ {
 			if !game.IsEmpty(row, col) {
-				fmt.Println("Drawing: ", row, col)
 				var color pixel.RGBA
 				if game.IsDead(row, col) {
 					color = numino.Blue
@@ -93,12 +101,14 @@ func renderGameState(game *numino.GameState, grid *numino.Grid) numino.Drawer {
 					color = numino.Green
 				}
 
-				imgs = append(imgs, numino.CreateSquare(
+				img := numino.CreateSquare(
 					grid.ColumnToPixel(col),
 					grid.RowToPixel(row),
-					grid.SquareSize, color))
+					grid.SquareSize, color)
+				renderers = append(renderers, numino.NewImageRenderer(img))
 			}
 		}
 	}
-	return numino.ImagesDrawer(imgs)
+
+	return renderers
 }
