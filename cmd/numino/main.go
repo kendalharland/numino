@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/kharland/numino"
+	"golang.org/x/image/colornames"
 )
 
 func run() {
@@ -14,7 +16,11 @@ func run() {
 	if err != nil {
 		panic(err)
 	}
+
+	img := numino.CreateSquare(50, 50, 30)
 	for !win.Closed() {
+		win.Clear(colornames.Aliceblue)
+		img.Draw(win)
 		win.Update()
 	}
 }
