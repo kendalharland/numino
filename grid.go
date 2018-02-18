@@ -24,8 +24,8 @@ func (g Grid) ColumnToPixel(n int) (float64, error) {
 }
 
 func (g Grid) RowToPixel(n int) (float64, error) {
-	if n < 0 || n >= g.Cols {
+	if n < 0 || n >= g.Rows {
 		return -1, errors.New("invalid row: " + string(n))
 	}
-	return float64(n) * g.SquareSize, nil
+	return float64(g.Rows-1-n) * g.SquareSize, nil
 }
