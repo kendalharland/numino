@@ -46,6 +46,16 @@ func run() {
 	}
 
 	for !win.Closed() {
+		if win.JustPressed(pixelgl.KeyS) {
+			fallingBlocks.Slam()
+		}
+		if win.Pressed(pixelgl.KeyA) {
+			fallingBlocks.ShiftLeft(game)
+		}
+		if win.Pressed(pixelgl.KeyD) {
+			fallingBlocks.ShiftRight(game)
+		}
+
 		// Update sub systems.
 		fallingBlocks.Update(1, game)
 
@@ -70,7 +80,7 @@ func run() {
 		renderGameState(game, grid).Render(win)
 		renderBlocks(fallingBlocks.Blocks(), grid).Render(win)
 		win.Update()
-		time.Sleep(time.Second / 2)
+		time.Sleep(time.Second / 5)
 	}
 }
 
