@@ -45,13 +45,13 @@ func run() {
 		// Update sub systems.
 		fallingBlocks.Update(1, game)
 
-		// Add landed blocks to the grid.  If all blocks have landed, generate
-		// a new wave of blocks.
+		// Add landed blocks to the grid.
 		landedBlocks := fallingBlocks.LandedBlocks(game)
 		for _, block := range landedBlocks {
 			game.AddBlock(block)
 			fallingBlocks.Remove(block.Row, block.Col)
 		}
+		// If all blocks have landed, generate a new wave of blocks.
 		if fallingBlocks.Length() == 0 {
 			fallingBlocks.Random(random, game.ColCount())
 		}
