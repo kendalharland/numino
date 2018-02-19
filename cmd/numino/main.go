@@ -18,9 +18,11 @@ import (
 
 const (
 	// The number of rows to start the game with
-	numRows = 15
+	numRows = 12
 	// The number of cols to start the game with
 	numCols = 8
+	// The starting speed of falling blocks. bigger == easier.
+	startingTicksPerStep = 120
 )
 
 var (
@@ -33,7 +35,7 @@ func run() {
 
 	game := numino.NewGameState(numRows, numCols)
 	grid := &numino.Grid{Cols: numCols, Rows: numRows, SquareSize: 50}
-	fallingBlocks := numino.NewFallingBlocks(30)
+	fallingBlocks := numino.NewFallingBlocks(startingTicksPerStep)
 
 	cfg := pixelgl.WindowConfig{
 		Title:  "Numino",
@@ -44,9 +46,11 @@ func run() {
 		panic(err)
 	}
 
-	ticks := 0
+	var ticks, nextSpeedup float64 = 0, startingTicksPerStep + 10000
+
 	for !win.Closed() {
 		ticks++
+
 		if win.JustPressed(pixelgl.KeyS) {
 			fallingBlocks.Slam()
 		}
@@ -59,6 +63,11 @@ func run() {
 
 		// Update sub systems.
 		fallingBlocks.Update(ticks, game)
+		if nextSpeedup <= ticks {
+			fmt.Println("Speedup")
+			fallingBlocks.Speedup()
+			nextSpeedup = ticks + 10000
+		}
 
 		// Add landed blocks to the grid.
 		landedBlocks := fallingBlocks.LandedBlocks(game)

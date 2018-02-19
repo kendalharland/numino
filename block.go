@@ -20,7 +20,7 @@ type FallingBlocks struct {
 }
 
 // NewFallingBlocks returns a pointer to a new FallingBlocks.
-func NewFallingBlocks(ticksPerStep int) *FallingBlocks {
+func NewFallingBlocks(ticksPerStep float64) *FallingBlocks {
 	return &FallingBlocks{
 		counter: counter{Ticks: ticksPerStep},
 	}
@@ -34,7 +34,7 @@ func (blocks FallingBlocks) Blocks() []Block {
 }
 
 // Update updates this FallingBlocks given the current ticks and gameState.
-func (blocks *FallingBlocks) Update(ticks int, game *GameState) {
+func (blocks *FallingBlocks) Update(ticks float64, game *GameState) {
 	if blocks.counter.Update(ticks) {
 		for i := range blocks.blocks {
 			blocks.blocks[i].Row++
@@ -96,13 +96,17 @@ func (blocks *FallingBlocks) Remove(row int, col int) {
 func (blocks *FallingBlocks) Random(r *rand.Rand, count int) {
 	for i := 0; i < count; i++ {
 		if (r.Int() % 5) > 3 {
-			value := r.Int() % 10
+			value := r.Int()%10 - 3
 			if value == 0 {
-				value += 5
+				value = 1
 			}
 			blocks.Add(0, i, value)
 		}
 	}
+}
+
+func (blocks *FallingBlocks) Speedup() {
+	blocks.counter.Ticks *= .9
 }
 
 func (blocks *FallingBlocks) Slam() {
