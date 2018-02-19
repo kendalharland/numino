@@ -1,5 +1,7 @@
 package numino
 
+import "math"
+
 // GameState represents the state
 type GameState struct {
 	// blocks are blocks that have been placed on the grid.
@@ -92,7 +94,7 @@ func (gs *GameState) AddBlock(block Block) {
 
 	// Merge live block values.
 	gs.blocks[block.Row][block.Col] += block.Value
-	if gs.blocks[block.Row][block.Col] > maxLiveValue {
+	if math.Abs(float64(gs.blocks[block.Row][block.Col])) > maxLiveValue {
 		gs.blockState[block.Row][block.Col] = DeadBlock
 	}
 }

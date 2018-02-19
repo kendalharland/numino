@@ -46,7 +46,9 @@ func run() {
 		panic(err)
 	}
 
-	var ticks, nextSpeedup float64 = 0, startingTicksPerStep + 10000
+	var ticks float64
+	var nextSpeedup float64 = startingTicksPerStep + 10000
+	var score float64
 
 	for !win.Closed() {
 		ticks++
@@ -72,6 +74,7 @@ func run() {
 		// Add landed blocks to the grid.
 		landedBlocks := fallingBlocks.LandedBlocks(game)
 		for _, block := range landedBlocks {
+			score++
 			game.AddBlock(block)
 			fallingBlocks.Remove(block.Row, block.Col)
 		}
@@ -89,12 +92,19 @@ func run() {
 		win.Clear(colornames.Aliceblue)
 		renderGameState(game, grid).Render(win)
 		renderBlocks(fallingBlocks.Blocks(), grid).Render(win)
+		renderScore(score, grid).Render(win)
 		win.Update()
 	}
 }
 
 func main() {
 	pixelgl.Run(run)
+}
+
+func renderScore(score float64, grid *numino.Grid) numino.Renderer {
+	txt := text.New(pixel.V(grid.ColumnToCell(grid.Cols-2), grid.RowToCell(0)), atlas)
+	fmt.Fprintf(txt, "Score: %v", score)
+	return numino.NewTextRenderer(txt)
 }
 
 func renderBlocks(blocks []numino.Block, grid *numino.Grid) numino.Renderer {
