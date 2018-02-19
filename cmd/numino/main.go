@@ -110,7 +110,7 @@ func renderScore(score float64, grid *numino.Grid) numino.Renderer {
 func renderBlocks(blocks []numino.Block, grid *numino.Grid) numino.Renderer {
 	var renderers numino.MultiRenderer
 	for _, block := range blocks {
-		renderers = append(renderers, renderBlock(block, grid, colornames.Red))
+		renderers = append(renderers, renderBlock(block, grid, colornames.Cornflowerblue))
 	}
 
 	return renderers
@@ -140,9 +140,9 @@ func renderGameState(game *numino.GameState, grid *numino.Grid) numino.Renderer 
 
 				var color color.RGBA
 				if game.IsDead(row, col) {
-					color = colornames.Blue
+					color = colornames.Tomato
 				} else {
-					color = colornames.Green
+					color = colornames.Aquamarine
 				}
 
 				block := numino.Block{Col: col, Row: row,
