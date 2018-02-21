@@ -3,6 +3,8 @@ numino
 
 Numino is a tetris-clone that uses numbers instead of shapes. 
 
+[[https://github.com/kharland/numino/blob/master/numino.png|alt=numino]]
+
 ## Quickstart
 ```sh
 go install github.com/kharland/numino/cmd/numino
