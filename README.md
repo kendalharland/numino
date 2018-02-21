@@ -1,9 +1,15 @@
-numino
-=
+
+<h1 align="center">
+  <br>
+  <a href="https://github.com/kharland/numino"><img src="./numino.png" alt="numino" width="200"></a>
+  <br>
+  Numino
+  <br>
+  <br>
+</h1>
 
 Numino is a tetris-clone that uses numbers instead of shapes. 
 
-[numino screenshot](./numino.png)
 
 ## Quickstart
 ```sh
