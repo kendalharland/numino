@@ -264,6 +264,7 @@ func drawSlamTrail(col int, rowStart int, rowEnd int, grid *Grid, buf *ImageBuff
 }
 
 // CreateSquare returns a square at position x, y whose side length is size.
+// TODO: Finish switching to drawRect and delete this.
 func drawSquare(y float64, x float64, size float64, color color.RGBA, buf *ImageBuffer) {
 	buf.Color(color)
 	buf.Vertex(x, y)
